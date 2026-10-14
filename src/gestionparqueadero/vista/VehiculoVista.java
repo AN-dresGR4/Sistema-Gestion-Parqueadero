@@ -5,174 +5,24 @@ import gestionparqueadero.modelo.Vehiculo;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class VehiculoVista extends JFrame {
+public class VehiculoVista extends javax.swing.JFrame {
 
     private final VehiculoControlador controlador;
-
-    private JTextField txtPlaca;
-    private JTextField txtMarca;
-    private JTextField txtModelo;
-    private JTextField txtColor;
-    private JTextField txtIdCliente;
-    private JComboBox<String> cbTipoVehiculo;
-
-    private JButton btnGuardar;
-    private JButton btnBuscar;
-    private JButton btnActualizar;
-    private JButton btnEliminar;
-    private JButton btnLimpiar;
-
-    private JTable tablaVehiculos;
     private DefaultTableModel modeloTabla;
 
     public VehiculoVista() {
         controlador = new VehiculoControlador();
         initComponents();
+        configurarTabla();
         cargarDatosTabla();
         setLocationRelativeTo(null);
     }
 
-    private void initComponents() {
-        setTitle("Gestión de Vehículos - Sistema Parqueadero");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(850, 600);
-        setLayout(new BorderLayout(10, 10));
-
-        // --- PANEL SUPERIOR: TÍTULO ---
-        JPanel panelTitulo = new JPanel();
-        panelTitulo.setBackground(new Color(41, 128, 185));
-        JLabel lblTitulo = new JLabel("SISTEMA DE GESTIÓN DE PARQUEADERO - CRUD VEHÍCULOS");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTitulo.setForeground(Color.WHITE);
-        panelTitulo.add(lblTitulo);
-        add(panelTitulo, BorderLayout.NORTH);
-
-        // --- PANEL CENTRAL: FORMULARIO ---
-        JPanel panelFormulario = new JPanel(new GridBagLayout());
-        panelFormulario.setBorder(BorderFactory.createTitledBorder("Datos del Vehículo"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Placa
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelFormulario.add(new JLabel("Placa:"), gbc);
-        gbc.gridx = 1;
-        txtPlaca = new JTextField(12);
-        panelFormulario.add(txtPlaca, gbc);
-
-        // Marca
-        gbc.gridx = 2; gbc.gridy = 0;
-        panelFormulario.add(new JLabel("Marca:"), gbc);
-        gbc.gridx = 3;
-        txtMarca = new JTextField(12);
-        panelFormulario.add(txtMarca, gbc);
-
-        // Modelo
-        gbc.gridx = 0; gbc.gridy = 1;
-        panelFormulario.add(new JLabel("Modelo:"), gbc);
-        gbc.gridx = 1;
-        txtModelo = new JTextField(12);
-        panelFormulario.add(txtModelo, gbc);
-
-        // Color
-        gbc.gridx = 2; gbc.gridy = 1;
-        panelFormulario.add(new JLabel("Color:"), gbc);
-        gbc.gridx = 3;
-        txtColor = new JTextField(12);
-        panelFormulario.add(txtColor, gbc);
-
-        // ID Cliente
-        gbc.gridx = 0; gbc.gridy = 2;
-        panelFormulario.add(new JLabel("ID Cliente:"), gbc);
-        gbc.gridx = 1;
-        txtIdCliente = new JTextField(12);
-        txtIdCliente.setText("1"); // Valor por defecto
-        panelFormulario.add(txtIdCliente, gbc);
-
-        // Tipo Vehículo
-        gbc.gridx = 2; gbc.gridy = 2;
-        panelFormulario.add(new JLabel("Tipo Vehículo:"), gbc);
-        gbc.gridx = 3;
-        cbTipoVehiculo = new JComboBox<>(new String[]{"1 - Automóvil", "2 - Motocicleta", "3 - Camioneta"});
-        panelFormulario.add(cbTipoVehiculo, gbc);
-
-        // --- PANEL DE BOTONES ---
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        btnGuardar = new JButton("Guardar");
-        btnGuardar.setBackground(new Color(46, 204, 113));
-        btnGuardar.setForeground(Color.WHITE);
-
-        btnBuscar = new JButton("Buscar");
-        btnBuscar.setBackground(new Color(52, 152, 219));
-        btnBuscar.setForeground(Color.WHITE);
-
-        btnActualizar = new JButton("Actualizar");
-        btnActualizar.setBackground(new Color(241, 196, 15));
-        btnActualizar.setForeground(Color.BLACK);
-
-        btnEliminar = new JButton("Eliminar");
-        btnEliminar.setBackground(new Color(231, 76, 60));
-        btnEliminar.setForeground(Color.WHITE);
-
-        btnLimpiar = new JButton("Limpiar");
-
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnBuscar);
-        panelBotones.add(btnActualizar);
-        panelBotones.add(btnEliminar);
-        panelBotones.add(btnLimpiar);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        gbc.gridwidth = 4;
-        panelFormulario.add(panelBotones, gbc);
-
-        // --- PANEL INFERIOR: TABLA DE DATOS ---
-        String[] columnas = {"Placa", "Marca", "Modelo", "Color", "ID Cliente", "ID Tipo"};
-        modeloTabla = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        tablaVehiculos = new JTable(modeloTabla);
-        tablaVehiculos.setRowHeight(22);
-        JScrollPane scrollTabla = new JScrollPane(tablaVehiculos);
-        scrollTabla.setBorder(BorderFactory.createTitledBorder("Vehículos Registrados"));
-
-        JPanel panelCentro = new JPanel(new BorderLayout(5, 5));
-        panelCentro.add(panelFormulario, BorderLayout.NORTH);
-        panelCentro.add(scrollTabla, BorderLayout.CENTER);
-
-        add(panelCentro, BorderLayout.CENTER);
-
-        // --- EVENTOS ---
-        btnGuardar.addActionListener(e -> guardarVehiculo());
-        btnBuscar.addActionListener(e -> buscarVehiculo());
-        btnActualizar.addActionListener(e -> actualizarVehiculo());
-        btnEliminar.addActionListener(e -> eliminarVehiculo());
-        btnLimpiar.addActionListener(e -> limpiarCampos());
-
-        tablaVehiculos.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int fila = tablaVehiculos.getSelectedRow();
-                if (fila >= 0) {
-                    txtPlaca.setText(modeloTabla.getValueAt(fila, 0).toString());
-                    txtMarca.setText(modeloTabla.getValueAt(fila, 1).toString());
-                    txtModelo.setText(modeloTabla.getValueAt(fila, 2).toString());
-                    txtColor.setText(modeloTabla.getValueAt(fila, 3).toString());
-                    txtIdCliente.setText(modeloTabla.getValueAt(fila, 4).toString());
-                    int idTipo = Integer.parseInt(modeloTabla.getValueAt(fila, 5).toString());
-                    cbTipoVehiculo.setSelectedIndex(idTipo - 1);
-                }
-            }
-        });
+    private void configurarTabla() {
+        modeloTabla = (DefaultTableModel) tablaVehiculos.getModel();
     }
 
     private void cargarDatosTabla() {
@@ -180,12 +30,12 @@ public class VehiculoVista extends JFrame {
         List<Vehiculo> lista = controlador.listarVehiculos();
         for (Vehiculo v : lista) {
             Object[] fila = {
-                    v.getPlaca(),
-                    v.getMarca(),
-                    v.getModelo(),
-                    v.getColor(),
-                    v.getIdCliente(),
-                    v.getIdTipo()
+                v.getPlaca(),
+                v.getMarca(),
+                v.getModelo(),
+                v.getColor(),
+                v.getIdCliente(),
+                v.getIdTipo()
             };
             modeloTabla.addRow(fila);
         }
@@ -197,83 +47,6 @@ public class VehiculoVista extends JFrame {
             return Integer.parseInt(item.split(" - ")[0]);
         }
         return 1;
-    }
-
-    private void guardarVehiculo() {
-        if (validarCampos()) {
-            String placa = txtPlaca.getText().trim().toUpperCase();
-            String marca = txtMarca.getText().trim();
-            String modelo = txtModelo.getText().trim();
-            String color = txtColor.getText().trim();
-            int idCliente = Integer.parseInt(txtIdCliente.getText().trim());
-            int idTipo = obtenerIdTipoSeleccionado();
-
-            if (controlador.registrarVehiculo(placa, marca, modelo, color, idCliente, idTipo)) {
-                JOptionPane.showMessageDialog(this, "Vehículo registrado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                limpiarCampos();
-                cargarDatosTabla();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al registrar vehículo. Verifique que la placa no esté duplicada o que el ID Cliente exista.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void buscarVehiculo() {
-        String placa = txtPlaca.getText().trim().toUpperCase();
-        if (placa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese una placa para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Vehiculo v = controlador.buscarVehiculo(placa);
-        if (v != null) {
-            txtMarca.setText(v.getMarca());
-            txtModelo.setText(v.getModelo());
-            txtColor.setText(v.getColor());
-            txtIdCliente.setText(String.valueOf(v.getIdCliente()));
-            cbTipoVehiculo.setSelectedIndex(v.getIdTipo() - 1);
-            JOptionPane.showMessageDialog(this, "Vehículo encontrado.", "Información", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "No se encontró ningún vehículo con la placa: " + placa, "No Encontrado", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
-    private void actualizarVehiculo() {
-        if (validarCampos()) {
-            String placa = txtPlaca.getText().trim().toUpperCase();
-            String marca = txtMarca.getText().trim();
-            String modelo = txtModelo.getText().trim();
-            String color = txtColor.getText().trim();
-            int idCliente = Integer.parseInt(txtIdCliente.getText().trim());
-            int idTipo = obtenerIdTipoSeleccionado();
-
-            if (controlador.actualizarVehiculo(placa, marca, modelo, color, idCliente, idTipo)) {
-                JOptionPane.showMessageDialog(this, "Vehículo actualizado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                limpiarCampos();
-                cargarDatosTabla();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al actualizar vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void eliminarVehiculo() {
-        String placa = txtPlaca.getText().trim().toUpperCase();
-        if (placa.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Seleccione o ingrese una placa para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el vehículo con placa " + placa + "?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (controlador.eliminarVehiculo(placa)) {
-                JOptionPane.showMessageDialog(this, "Vehículo eliminado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                limpiarCampos();
-                cargarDatosTabla();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
     }
 
     private void limpiarCampos() {
@@ -304,11 +77,370 @@ public class VehiculoVista extends JFrame {
         return true;
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {}
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
 
-        java.awt.EventQueue.invokeLater(() -> new VehiculoVista().setVisible(true));
+        panelTitulo = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        panelFormulario = new javax.swing.JPanel();
+        lblPlaca = new javax.swing.JLabel();
+        txtPlaca = new javax.swing.JTextField();
+        lblMarca = new javax.swing.JLabel();
+        txtMarca = new javax.swing.JTextField();
+        lblModelo = new javax.swing.JLabel();
+        txtModelo = new javax.swing.JTextField();
+        lblColor = new javax.swing.JLabel();
+        txtColor = new javax.swing.JTextField();
+        lblCliente = new javax.swing.JLabel();
+        txtIdCliente = new javax.swing.JTextField();
+        lblTipo = new javax.swing.JLabel();
+        cbTipoVehiculo = new javax.swing.JComboBox<>();
+        btnGuardar = new javax.swing.JButton();
+        btnBuscar = new javax.swing.JButton();
+        btnActualizar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
+        scrollTabla = new javax.swing.JScrollPane();
+        tablaVehiculos = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Gestión de Vehículos - Sistema Parqueadero");
+
+        panelTitulo.setBackground(new java.awt.Color(41, 128, 185));
+
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitulo.setText("SISTEMA DE GESTIÓN DE PARQUEADERO - CRUD VEHÍCULOS");
+        panelTitulo.add(lblTitulo);
+
+        panelFormulario.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del Vehículo"));
+
+        lblPlaca.setText("Placa:");
+
+        lblMarca.setText("Marca:");
+
+        lblModelo.setText("Modelo:");
+
+        lblColor.setText("Color:");
+
+        lblCliente.setText("ID Cliente:");
+
+        txtIdCliente.setText("1");
+
+        lblTipo.setText("Tipo Vehículo:");
+
+        cbTipoVehiculo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1 - Automóvil", "2 - Motocicleta", "3 - Camioneta" }));
+
+        btnGuardar.setBackground(new java.awt.Color(46, 204, 113));
+        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setText("Guardar");
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarActionPerformed(evt);
+            }
+        });
+
+        btnBuscar.setBackground(new java.awt.Color(52, 152, 219));
+        btnBuscar.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
+
+        btnActualizar.setBackground(new java.awt.Color(241, 196, 15));
+        btnActualizar.setText("Actualizar");
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
+
+        btnEliminar.setBackground(new java.awt.Color(231, 76, 60));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+
+        btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelFormularioLayout = new javax.swing.GroupLayout(panelFormulario);
+        panelFormulario.setLayout(panelFormularioLayout);
+        panelFormularioLayout.setHorizontalGroup(
+            panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFormularioLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelFormularioLayout.createSequentialGroup()
+                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelFormularioLayout.createSequentialGroup()
+                        .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblPlaca)
+                            .addComponent(lblModelo)
+                            .addComponent(lblCliente))
+                        .addGap(20, 20, 20)
+                        .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtPlaca, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                            .addComponent(txtModelo)
+                            .addComponent(txtIdCliente))
+                        .addGap(40, 40, 40)
+                        .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblMarca)
+                            .addComponent(lblColor)
+                            .addComponent(lblTipo))
+                        .addGap(20, 20, 20)
+                        .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtMarca, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                            .addComponent(txtColor)
+                            .addComponent(cbTipoVehiculo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        panelFormularioLayout.setVerticalGroup(
+            panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFormularioLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPlaca)
+                    .addComponent(txtPlaca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblMarca)
+                    .addComponent(txtMarca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblModelo)
+                    .addComponent(txtModelo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblColor)
+                    .addComponent(txtColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblCliente)
+                    .addComponent(txtIdCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTipo)
+                    .addComponent(cbTipoVehiculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addGroup(panelFormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15))
+        );
+
+        scrollTabla.setBorder(javax.swing.BorderFactory.createTitledBorder("Vehículos Registrados"));
+
+        tablaVehiculos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {},
+            new String [] {
+                "Placa", "Marca", "Modelo", "Color", "ID Cliente", "ID Tipo"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tablaVehiculos.setRowHeight(22);
+        tablaVehiculos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablaVehiculosMouseClicked(evt);
+            }
+        });
+        scrollTabla.setViewportView(tablaVehiculos);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelFormulario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollTabla, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(panelFormulario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(scrollTabla, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        if (validarCampos()) {
+            String placa = txtPlaca.getText().trim().toUpperCase();
+            String marca = txtMarca.getText().trim();
+            String modelo = txtModelo.getText().trim();
+            String color = txtColor.getText().trim();
+            int idCliente = Integer.parseInt(txtIdCliente.getText().trim());
+            int idTipo = obtenerIdTipoSeleccionado();
+
+            if (controlador.registrarVehiculo(placa, marca, modelo, color, idCliente, idTipo)) {
+                JOptionPane.showMessageDialog(this, "Vehículo registrado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+                cargarDatosTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al registrar vehículo. Verifique que la placa no esté duplicada o que el ID Cliente exista.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }                                          
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        String placa = txtPlaca.getText().trim().toUpperCase();
+        if (placa.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese una placa para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Vehiculo v = controlador.buscarVehiculo(placa);
+        if (v != null) {
+            txtMarca.setText(v.getMarca());
+            txtModelo.setText(v.getModelo());
+            txtColor.setText(v.getColor());
+            txtIdCliente.setText(String.valueOf(v.getIdCliente()));
+            cbTipoVehiculo.setSelectedIndex(v.getIdTipo() - 1);
+            JOptionPane.showMessageDialog(this, "Vehículo encontrado.", "Información", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún vehículo con la placa: " + placa, "No Encontrado", JOptionPane.WARNING_MESSAGE);
+        }
+    }                                         
+
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        if (validarCampos()) {
+            String placa = txtPlaca.getText().trim().toUpperCase();
+            String marca = txtMarca.getText().trim();
+            String modelo = txtModelo.getText().trim();
+            String color = txtColor.getText().trim();
+            int idCliente = Integer.parseInt(txtIdCliente.getText().trim());
+            int idTipo = obtenerIdTipoSeleccionado();
+
+            if (controlador.actualizarVehiculo(placa, marca, modelo, color, idCliente, idTipo)) {
+                JOptionPane.showMessageDialog(this, "Vehículo actualizado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+                cargarDatosTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al actualizar vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }                                             
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        String placa = txtPlaca.getText().trim().toUpperCase();
+        if (placa.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione o ingrese una placa para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el vehículo con placa " + placa + "?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (controlador.eliminarVehiculo(placa)) {
+                JOptionPane.showMessageDialog(this, "Vehículo eliminado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+                cargarDatosTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }                                           
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        limpiarCampos();
+    }                                           
+
+    private void tablaVehiculosMouseClicked(java.awt.event.MouseEvent evt) {                                            
+        int fila = tablaVehiculos.getSelectedRow();
+        if (fila >= 0) {
+            txtPlaca.setText(modeloTabla.getValueAt(fila, 0).toString());
+            txtMarca.setText(modeloTabla.getValueAt(fila, 1).toString());
+            txtModelo.setText(modeloTabla.getValueAt(fila, 2).toString());
+            txtColor.setText(modeloTabla.getValueAt(fila, 3).toString());
+            txtIdCliente.setText(modeloTabla.getValueAt(fila, 4).toString());
+            int idTipo = Integer.parseInt(modeloTabla.getValueAt(fila, 5).toString());
+            cbTipoVehiculo.setSelectedIndex(idTipo - 1);
+        }
+    }                                           
+
+    public static void main(String args[]) {
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(VehiculoVista.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(VehiculoVista.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(VehiculoVista.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(VehiculoVista.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new VehiculoVista().setVisible(true);
+            }
+        });
     }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar;
+    private javax.swing.JComboBox<String> cbTipoVehiculo;
+    private javax.swing.JLabel lblCliente;
+    private javax.swing.JLabel lblColor;
+    private javax.swing.JLabel lblMarca;
+    private javax.swing.JLabel lblModelo;
+    private javax.swing.JLabel lblPlaca;
+    private javax.swing.JLabel lblTipo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel panelFormulario;
+    private javax.swing.JPanel panelTitulo;
+    private javax.swing.JScrollPane scrollTabla;
+    private javax.swing.JTable tablaVehiculos;
+    private javax.swing.JTextField txtColor;
+    private javax.swing.JTextField txtIdCliente;
+    private javax.swing.JTextField txtMarca;
+    private javax.swing.JTextField txtModelo;
+    private javax.swing.JTextField txtPlaca;
+    // End of variables declaration                   
 }
